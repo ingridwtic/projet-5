@@ -3,15 +3,15 @@ fetch("http://localhost:3000/api/products")
 .then(res =>res.json())
 .then((data) => addArticles(data))
 
-function addArticles(data) {
+function addArticles(sofa) {
 
-    data.forEach((data) =>{  //add the loop pour fabriquer les elements html de chacun des caapes
+    sofa.forEach((sofa) =>{  //add the loop pour fabriquer les elements html de chacun des caapes
       
-    const id = data._id
-    const imageUrl = data.imageUrl
-    const altTxt =data.altTxt
-    const name = data.name
-    const description = data.description
+    const id = sofa._id
+    const imageUrl = sofa.imageUrl
+    const altTxt =sofa.altTxt
+    const name = sofa.name
+    const description = sofa.description
    
 
     const image = addImage(imageUrl,altTxt)
