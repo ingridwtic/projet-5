@@ -1,6 +1,6 @@
 
-fetch("http://localhost:3000/api/products") 
-.then(res =>res.json())
+fetch("http://localhost:3000/api/products") // creer une requette via l'Api fetch le http
+.then(res =>res.json())   // renvoie de la promesse
 .then((data) => addArticles(data))
 
 function addArticles(sofa) {
