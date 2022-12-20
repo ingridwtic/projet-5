@@ -104,7 +104,14 @@ function saveCart(color,quantity) {
      else{
         cart = JSON.parse(localStorage.getItem("cart")) // JSON.parse Pour transformer la chaine de caractère en objet
      }
+     if( cart.find((item) => item.id === productId && item.color === color)!= null ){
+        const modifyProduct = cart.find ((item) => item.id === productId && item.color === color)
+        modifyProduct.quantity = Number(quantity) + modifyProduct.quantity
+        //modifier la quantité du produit existant
+     } else{
         cart.push(bag)
+     }
+       
      
      
           
