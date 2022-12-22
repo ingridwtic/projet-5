@@ -1,11 +1,8 @@
 
-/*const page = document.location.href;
-fetch("http://localhost:3000/api/products")
-  .then((res) => res.json())
-  .then((objetProduits) => {
-      console.log(objetProduits);
-      // appel de la fonction 
-  })*/
+//Récupération des produits de l'api et traitement des données
+/*fetch(`http://localhost:3000/api/products/${productId}`)  // creer une requette via l'Api fetch pour avoir l'id du produit
+.then(res => res.json())
+.then (res => addData(res))*/
 
 
 
@@ -205,7 +202,7 @@ function submitForm(e){
         .then((res) => res.json())
         .then((data) => {
         // envoyé à la page confirmation, autre écriture de la valeur "./confirmation.html?commande=${data.orderId}"
-        window.location.href = `/front/html/confirmation.html?commande=${data.orderId}`;
+      //window.location.href = `/front/html/confirmation.html?commande=${data.orderId}`;
       })
       .catch(function (err) {
         console.log(err);
@@ -236,14 +233,17 @@ return body
 }
 
 function getIdCache(){
-    const numberProducts = localStorage.length
     const ids = []
-    for ( let i = 0 ; i < numberProducts; i++){  // faire une loupe
-        const key = localStorage.key(i) // recuperer la clé
-        const id = key.split("-")[0] // recevoir la valeur située avant le trait d'union
-        ids.push(id)
-    } 
-    return ids
+    const panier = JSON.parse(localStorage.getItem ("cart"))
+    
+    const numberProducts = panier.length
+    for ( let i= 0; i< numberProducts; i++){
+        const product = panier[i];
+        ids.push(product.id)
+    }
+
+    return ids;
+  
 }
 
 function invalidForm(){

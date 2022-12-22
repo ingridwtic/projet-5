@@ -1,9 +1,11 @@
 const queryString = window.location.search //pour recuperer le queryString des produits
+console.log (queryString)
 const urlParams = new URLSearchParams(queryString) // paramettre employé dans l'element
-const orderId = urlParams.get("orderId") 
+console.log (urlParams)
+const orderId = urlParams.get("commande") 
 console.log(orderId)  
 addOrderId(orderId)
-//removeCatch()
+removeCatch()
 
 
 function addOrderId(orderId) {
