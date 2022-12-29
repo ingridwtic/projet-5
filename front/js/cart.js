@@ -1,185 +1,180 @@
-
+const page = document.location.href
 //Récupération des produits de l'api et traitement des données
-/*fetch(`http://localhost:3000/api/products/${productId}`)  // creer une requette via l'Api fetch pour avoir l'id du produit
-.then(res => res.json())
-.then (res => addData(res))*/
+let newCart = [] 
+
+fetch("http://localhost:3000/api/products") // creer une requette via l'Api fetch le http
+.then(res =>res.json())   // renvoie de la promesse sous forme de fichier JSON
+.then((data) => viewCart(data))  //
 
 
-
- 
-
-storage() ;    //appel de la function
-
-const cart = JSON.parse(localStorage.getItem("cart"))
-cart.forEach((item) => addItem(item))
-
-
-
-function storage() {
-
-   
-    
+function viewCart(data){
+    //let newCart = []
+    const cart = JSON.parse(localStorage.getItem("cart"))
+    if(cart && cart.length != 0){
+        cart.forEach((itemCart)=> {
+            data.forEach((itemData)=> {
+                if(itemData._id === itemCart.id){
+                    newCart.push({
+                        id : itemCart.id, 
+                        name : itemData.name,
+                        price : itemData.price,
+                        imageUrl : itemData.imageUrl,
+                        altTxt : itemData.altTxt,
+                        color  : itemCart.color,
+                        quantity: itemCart.quantity,
+                    })
+                }
+            })
+        })
+        const section = document.getElementById("cart__items")
+        
+        for(let i= 0; i< newCart.length; i++){
+            const item =  createArticle(newCart[i])
+            section.appendChild(item)
+        }
+        addTotalQuantity(newCart)
+        addTotalPrice(newCart)
+       
+    }        
+      
 }
 
-function addItem(item) {
-    
-    const article = addArticle(item)
-    selectArticle(article)
-    console.log(article)
-    const image = addImage(item)
-    article.appendChild(image)
-    const cartContent = addCartContent(item)
-    article.appendChild(cartContent)
-   console.log(article)
-   addTotalQuantity(item)
-   addTotalPrice()
-}
-
-
-function addCartContent(item){
-
- const cartContent = document.createElement("div")
- cartContent.classList.add("cart__item__content")
-     
- const description = addDescription(item) 
- const setting = addSetting(item) 
-
-cartContent.appendChild(description)
-cartContent.appendChild(setting)
-
-return cartContent
-}
-
-function selectArticle(article){
-    document.querySelector("#cart__items").appendChild(article)
-}
-
-function addArticle(item){
-
+function createArticle(item,cart){
+    //creer l'element article
     const article = document.createElement("article") // creer element article
     article.classList.add ("cart__item")  // ajout d'une class cart __item
     article.dataset.id = item.id // data set pour l'ajout des attribut
     article.dataset.color = item.color// data set pour l'ajout de l'attribut color
-    return article
-}
 
-function addImage (item){
-   const div = document.createElement("div")
-    div.classList.add("cart__item__img")
+     //creer l'element image
+    const cartItemImg = document.createElement("div")
+    cartItemImg.classList.add("cart__item__img")
+
     const image = document.createElement("img")
     image.src = item.imageUrl
     image.alt = item.altTxt
-    div.appendChild(image)
-    
-   return div
-}
-
-function addDescription(item){
+    cartItemImg.appendChild(image)
+    article.appendChild(cartItemImg)
+      //creer l'element cart__item__content
+    const cartContent = document.createElement("div")
+    cartContent.classList.add("cart__item__content")
+       //creer l'element description
     const description = document.createElement("div")
     description.classList.add("cart__item__content__description")
-    
-    const h2 = document.createElement("h2")
-    h2.textContent = item.name
-    const p =document.createElement("p")
-    p.textContent = item.color
-    const p1 = document.createElement("p")
-    p1.textContent = item.price + " €"
-   description.appendChild(p)
-   description.appendChild(h2)
-   description.appendChild(p1)
-    return description
+      //creer l'element name
+    const title = document.createElement("h2")
+    title.textContent = item.name
+        //creer l'element color
+    const color =document.createElement("p")
+    color.textContent = item.color
+        //creer l'element price
+    const price = document.createElement("p")
+    price.textContent = item.price + " €"
+      //attribuer des enfants a certains elements creer
+    description.appendChild(title)
+    description.appendChild(color)
+    description.appendChild(price)
+    cartContent.appendChild(description)
+    article.appendChild(cartContent)
+       //creer l'element setting
+    const setting = document.createElement("div")
+    setting.classList.add("cart__item__content__settings")
+
+       //creer l'element quantité
+    const settingQuantity = document.createElement("div")
+    settingQuantity.classList.add("cart__item__content__settings__quantity")
+    const quantity= document.createElement("p")
+    quantity.textContent = "Qté : " 
+       //creer l'element input
+    const input = document.createElement("input")
+    input.type = "number"
+    input.classList.add ("itemQuantity")
+    input.name = "itemQuantity"
+    input.min ="1"
+    input.max = "100"
+    input.value = item.quantity
+    input.addEventListener("input",(e) => AddChangeQuantity(e,item.id,item.color,input.value) )
+    settingQuantity.appendChild(quantity)
+    settingQuantity.appendChild(input)
+    setting.appendChild(settingQuantity)
+       //creer l'element delete
+    const deleteInput = document.createElement("div")
+    deleteInput.classList.add("cart__item__content__settings__delete")
+    deleteInput.addEventListener("click", () => removeItem(item))   // ajouter un evenement au click
+
+    const textInput = document.createElement("p")
+    textInput.classList.add("deleteItem")
+    textInput.textContent ="Supprimer"
+    deleteInput.appendChild(textInput)
+    setting.appendChild(deleteInput)
+    cartContent.appendChild(setting)
+
+    return article    
+
 }
-//ajouter un setting
-function addSetting(item){
-const setting = document.createElement("div")
-setting.classList.add("cart__item__content__settings")
-addQuantitySetting(setting, item)
-addDeleteSetting(setting, item)
-return setting
-}
-//ajouter une quantité
-function addQuantitySetting(setting,item){
- const quantity = document.createElement("div")
-quantity.classList.add("cart__item__content__settings__quantity")
-const p2 = document.createElement("p")
-p2.textContent = "Qté : " 
-quantity.appendChild(p2)
-const input = document.createElement("input")
-input.type = "number"
-input.classList.add ("itemQuantity")
-input.name = "itemQuantity"
-input.min ="1"
-input.max = "100"
-input.value = item.quantity
-input.addEventListener("input",() => AddChangeQuantity(item.id, item.color,input.value, item) )
-quantity.appendChild(input)
-setting.appendChild(quantity)
 
 
-}
 
 //ajout du prix total
-function addTotalPrice(){
+function addTotalPrice(cart){
+    
     const totalPrice = document.querySelector("#totalPrice")
-    const total = cart.reduce((total,item) => total + item.price * item.quantity,0)//function reduce pour transformer l'array en une seule valeur
-    totalPrice.textContent = total                 // la valeur initiale de total est de 0
+    const total = cart.reduce((total,item) => total + item.price * Number(item.quantity),0)//function reduce pour transformer l'array en une seule valeur
+    totalPrice.textContent = total 
+    console.log(cart)
+    console.log(total)                // la valeur initiale de total est de 0
     }
     //ajout de la quantité total
-    function addTotalQuantity(item) {
+    function addTotalQuantity(cart) {
      const totalQuantity = document.querySelector("#totalQuantity")
      const total = cart.reduce((total,item) => total +  item.quantity,0)//louper pour prendre quantity
     totalQuantity.textContent = total     
     }
-//modifier la quantité dans le panier
-function AddChangeQuantity(id,color,newValue,item){
-const changeQuantity = cart.find((item) => item.id === id && item.color === color )
-changeQuantity.quantity = Number(newValue)
-addTotalQuantity()
-addTotalPrice()
-saveNewCart(cart)
-}
-//modifier la quantité dans le localStorage
-function saveNewCart(cart){
-    const newCart = JSON.stringify(cart)
-     localStorage.setItem("cart", newCart )
-}
-// Ajouter un delete
-function addDeleteSetting(setting, item){
-    const delette = document.createElement("div")
-    delette.classList.add("cart__item__content__settings__delete")
-    delette.addEventListener("click", () => removeItem (item))
+    //modifier la quantité dans le panier
 
-    const p3 = document.createElement("p")
-    p3.classList.add("deleteItem")
-    p3.textContent ="Supprimer"
-    setting.appendChild(delette)
-    delette.appendChild(p3)
-    console.log(delette)
-}
+    const cart = JSON.parse(localStorage.getItem("cart"))
+
+ function AddChangeQuantity(event,id,color){
+    const changeQuantityBaseCart = cart.find((item) => item.id === id && item.color === color )
+    const changeQuantityNewCart = newCart.find((item) => item.id === id && item.color === color )
+    changeQuantityBaseCart.quantity = Number(event.target.value)
+    changeQuantityNewCart.quantity = Number(event.target.value)
+    saveNewCart(cart)
+    addTotalQuantity(cart)
+    addTotalPrice(newCart)
+
+    }
+    //modifier la quantité dans le localStorage
+ function saveNewCart(cart){
+        const newCart = JSON.stringify(cart)
+        localStorage.setItem("cart", newCart )
+    }
+    // Ajouter un delete
 
 function removeItem(item){
-    const remove = cart.findIndex ((product) => product.id === item.id && product.color === item.color)// findIndex pour trouver l'index du produit à supprimer
-   cart.splice(remove, 1) // supprimer un objet à l'item remove puis retirer 1 de la console
-   addTotalQuantity()
-   addTotalPrice()
-   saveNewCart(cart)
-   deletePageProduct(item)
-   console.log("item to delete",remove)
-   
-}
+        const removeBaseCart = cart.findIndex ((product) => product.id === item.id && product.color === item.color)// findIndex pour trouver l'index du produit à supprimer
+        const removeNewCart = newCart.findIndex ((product) => product.id === item.id && product.color === item.color)
+    cart.splice(removeBaseCart, 1) // supprimer un objet à l'item remove puis retirer 1 de la consolez
+    newCart.splice(removeNewCart, 1)
+    addTotalQuantity(cart)
+    addTotalPrice(newCart)
+    deletePageProduct(item)
+    saveNewCart(cart)
+    console.log("item to delete",remove)
+    
+    }
 
+    // suprimer un article de la page
+ function deletePageProduct(item){
+    const deleteProduct = document.querySelector(`article[data-id = "${item.id}"][data-color = "${item.color}"] `)
+    deleteProduct.remove()
+    console.log(deletePageProduct)
+    }
 
+    //ajout du formulaire
 
-// suprimer un article de la page
-function deletePageProduct(item){
- const deleteProduct = document.querySelector(`article[data-id = "${item.id}"][data-color = "${item.color}"] `)
- deleteProduct.remove()
-}
-
-//ajout du formulaire
-
-const orderButton = document.querySelector("#order")
-orderButton.addEventListener("click",(e) => submitForm(e))
+    const orderButton = document.querySelector("#order")
+    orderButton.addEventListener("click",(e) => submitForm(e))
 
 function submitForm(e){
     e.preventDefault()
@@ -187,8 +182,30 @@ function submitForm(e){
         alert ("Please select items to buy") // si le cart est vide envoyer une alerte
         return
     }
+    
+    if (firstName.value == "") {
+        alert("Mettez votre adresse.");
+        firstName.focus();
+        return false;
+      }
+    if (lastName.value == "") {
+        alert("Mettez votre nom.");
+        lastName.focus();
+        return false;
+      }
+    if (address.value == "") {
+        alert("Mettez votre adresse.");
+        address.focus();
+        return false;
+      }
+      if (city.value == "") {
+        alert("Mettez votre adresse.");
+        city.focus();
+        return false;
+      }
    if (invalidForm()) return
-    if (invalidEmail()) return  
+    if (invalidEmail()) return 
+    
     const body = addForm()
     fetch("http://localhost:3000/api/products/order", {
         method: "POST",
@@ -202,7 +219,7 @@ function submitForm(e){
         .then((res) => res.json())
         .then((data) => {
         // envoyé à la page confirmation, autre écriture de la valeur "./confirmation.html?commande=${data.orderId}"
-      //window.location.href = `/front/html/confirmation.html?commande=${data.orderId}`;
+      window.location.href = `/front/html/confirmation.html?commande=${data.orderId}`;
       })
       .catch(function (err) {
         console.log(err);
@@ -260,6 +277,7 @@ function invalidForm(){
     })
 }
 
+
 function invalidEmail(){
     const email = document.querySelector("#email").value // afficher la valeur de l'email
     const regex =   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/ //validation de l'adresse email
@@ -272,3 +290,5 @@ function invalidEmail(){
         }
     
 }
+
+
