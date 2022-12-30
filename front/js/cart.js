@@ -1,5 +1,5 @@
 const page = document.location.href
-//Récupération des produits de l'api et traitement des données
+    //Récupération des produits de l'api et traitement des données
 let newCart = [] 
 
 fetch("http://localhost:3000/api/products") // creer une requette via l'Api fetch le http
@@ -7,7 +7,7 @@ fetch("http://localhost:3000/api/products") // creer une requette via l'Api fetc
 .then((data) => viewCart(data))  //
 
 
-function viewCart(data){
+function viewCart(data) {
     //let newCart = []
     const cart = JSON.parse(localStorage.getItem("cart"))
     if(cart && cart.length != 0){
@@ -34,12 +34,10 @@ function viewCart(data){
         }
         addTotalQuantity(newCart)
         addTotalPrice(newCart)
-       
     }        
-      
 }
 
-function createArticle(item,cart){
+function createArticle(item,cart) {
     //creer l'element article
     const article = document.createElement("article") // creer element article
     article.classList.add ("cart__item")  // ajout d'une class cart __item
@@ -116,25 +114,24 @@ function createArticle(item,cart){
 
 
 //ajout du prix total
-function addTotalPrice(cart){
+function addTotalPrice(cart) {
     
     const totalPrice = document.querySelector("#totalPrice")
     const total = cart.reduce((total,item) => total + item.price * Number(item.quantity),0)//function reduce pour transformer l'array en une seule valeur
-    totalPrice.textContent = total 
-    console.log(cart)
-    console.log(total)                // la valeur initiale de total est de 0
-    }
+    totalPrice.textContent = total // la valeur initiale de total est de 0
+
+}
     //ajout de la quantité total
-    function addTotalQuantity(cart) {
-     const totalQuantity = document.querySelector("#totalQuantity")
-     const total = cart.reduce((total,item) => total +  item.quantity,0)//louper pour prendre quantity
+function addTotalQuantity(cart) {
+    const totalQuantity = document.querySelector("#totalQuantity")
+    const total = cart.reduce((total,item) => total +  item.quantity,0)//louper pour prendre quantity
     totalQuantity.textContent = total     
-    }
+}
     //modifier la quantité dans le panier
 
     const cart = JSON.parse(localStorage.getItem("cart"))
 
- function AddChangeQuantity(event,id,color){
+function AddChangeQuantity(event,id,color) {
     const changeQuantityBaseCart = cart.find((item) => item.id === id && item.color === color )
     const changeQuantityNewCart = newCart.find((item) => item.id === id && item.color === color )
     changeQuantityBaseCart.quantity = Number(event.target.value)
@@ -143,40 +140,39 @@ function addTotalPrice(cart){
     addTotalQuantity(cart)
     addTotalPrice(newCart)
 
-    }
+}
     //modifier la quantité dans le localStorage
- function saveNewCart(cart){
-        const newCart = JSON.stringify(cart)
-        localStorage.setItem("cart", newCart )
-    }
+function saveNewCart(cart) {
+    const newCart = JSON.stringify(cart)
+    localStorage.setItem("cart", newCart )
+}
     // Ajouter un delete
 
-function removeItem(item){
-        const removeBaseCart = cart.findIndex ((product) => product.id === item.id && product.color === item.color)// findIndex pour trouver l'index du produit à supprimer
-        const removeNewCart = newCart.findIndex ((product) => product.id === item.id && product.color === item.color)
+function removeItem(item) {
+    const removeBaseCart = cart.findIndex ((product) => product.id === item.id && product.color === item.color)// findIndex pour trouver l'index du produit à supprimer
+    const removeNewCart = newCart.findIndex ((product) => product.id === item.id && product.color === item.color)
     cart.splice(removeBaseCart, 1) // supprimer un objet à l'item remove puis retirer 1 de la consolez
-    newCart.splice(removeNewCart, 1)
+    newCart.splice(removeNewCart, 1)// Splice modifie le contenu d'un tableau en retirant des éléments et/ou en ajoutant de nouveaux éléments à même le tableau
     addTotalQuantity(cart)
     addTotalPrice(newCart)
     deletePageProduct(item)
     saveNewCart(cart)
-    console.log("item to delete",remove)
     
-    }
+}
 
     // suprimer un article de la page
- function deletePageProduct(item){
+function deletePageProduct(item) {
     const deleteProduct = document.querySelector(`article[data-id = "${item.id}"][data-color = "${item.color}"] `)
-    deleteProduct.remove()
-    console.log(deletePageProduct)
-    }
+    deleteProduct.remove()  
+}
 
     //ajout du formulaire
-
+//passer la commande
     const orderButton = document.querySelector("#order")
     orderButton.addEventListener("click",(e) => submitForm(e))
 
-function submitForm(e){
+    //condition de soumission du formulaire
+function submitForm(e) {
     e.preventDefault()
     if (cart.length === 0) {
         alert ("Please select items to buy") // si le cart est vide envoyer une alerte
@@ -187,47 +183,47 @@ function submitForm(e){
         alert("Mettez votre adresse.");
         firstName.focus();
         return false;
-      }
+    }
     if (lastName.value == "") {
         alert("Mettez votre nom.");
         lastName.focus();
         return false;
-      }
+    }
     if (address.value == "") {
         alert("Mettez votre adresse.");
         address.focus();
         return false;
-      }
-      if (city.value == "") {
+    }
+    if (city.value == "") {
         alert("Mettez votre adresse.");
         city.focus();
         return false;
-      }
-   if (invalidForm()) return
+    }
+    if (invalidForm()) return
     if (invalidEmail()) return 
     
     const body = addForm()
-    fetch("http://localhost:3000/api/products/order", {
-        method: "POST",
-        body: JSON.stringify(body),
-        headers: {
-            Accept: "application/json",
-          "Content-Type": "application/json"
-        }
-       
-      })
-        .then((res) => res.json())
-        .then((data) => {
-        // envoyé à la page confirmation, autre écriture de la valeur "./confirmation.html?commande=${data.orderId}"
-      window.location.href = `/front/html/confirmation.html?commande=${data.orderId}`;
-      })
-      .catch(function (err) {
-        console.log(err);
-        alert("erreur");
-      });
-}
+      //envoie des données au serveur
+fetch("http://localhost:3000/api/products/order", {
+    method: "POST",     
+    body: JSON.stringify(body),
+    headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+    }
 
-function addForm(){
+})
+    .then((res) => res.json())
+    .then((data) => {
+        // envoyé à la page confirmation, autre écriture de la valeur "./confirmation.html?commande=${data.orderId}"
+        window.location.href = `/front/html/confirmation.html?commande=${data.orderId}`;
+    })
+    .catch(function (err) {
+        alert("erreur");
+    });
+}
+    //ajout des elements au formulaire
+function addForm() {
     const form = document.querySelector(".cart__order__form") 
 
     const firstName = form.elements.firstName.value
@@ -236,40 +232,38 @@ function addForm(){
     const city = form.elements.city.value
     const email = form.elements.email.value
     const body = {
-    contact: {
-           firstName: firstName,
-          lastName: lastName,
-          address:address,
-           city: city,
-           email: email
+        contact: {
+            firstName: firstName,
+            lastName: lastName,
+            address:address,
+            city: city,
+            email: email
         },
-         products:getIdCache()
-}
-console.log (body)
-return body
+    products:getIdCache()
+    }
+    return body
 }
 
-function getIdCache(){
+function getIdCache() {
     const ids = []
     const panier = JSON.parse(localStorage.getItem ("cart"))
     
     const numberProducts = panier.length
-    for ( let i= 0; i< numberProducts; i++){
+    for ( let i= 0; i< numberProducts; i++) {
         const product = panier[i];
         ids.push(product.id)
     }
 
     return ids;
-  
 }
 
-function invalidForm(){
+function invalidForm() {
     const form = document.querySelector(".cart__order__form")
     const inputs = form.querySelectorAll("input") //rapporter la liste de tout les inputs
     inputs.forEach ((input) => {
-        if(input.value === ""){           // si la value est nulle
+        if(input.value === "") {           // si la value est nulle
             alert("please fill all the fieds ")  //alert
-         return  true                              //arretes toi
+            return  true                              //arretes toi
         }
         else{
             return false
@@ -277,13 +271,13 @@ function invalidForm(){
     })
 }
 
-
-function invalidEmail(){
+//condition de validation de l'email
+function invalidEmail() {
     const email = document.querySelector("#email").value // afficher la valeur de l'email
     const regex =   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/ //validation de l'adresse email
-        if(regex.test(email) === false){           // si la value est nulle
+        if(regex.test(email) === false) {           // si la value est nulle
             alert("please enter valid email")  //alert
-         return  true                              //arretes toi
+            return  true                              //arretes toi
         }
         else{
             return false

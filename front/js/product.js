@@ -4,11 +4,11 @@ const urlParams = new URLSearchParams(queryString) // paramettre employé dans l
 const productId = urlParams.get("id")       //Renvoyer le paramettre id ou recuperer l'id
 
 
-//Récupération des produits de l'api et traitement des données
+    //Récupération des produits de l'api et traitement des données
 fetch(`http://localhost:3000/api/products/${productId}`)  // creer une requette via l'Api fetch pour avoir l'id du produit
 .then(res => res.json())
 .then (res => addData(res))
-//Ajout des articles à la page de produits
+    //Ajout des articles à la page de produits
 function addData(kanap) {
     const altTxt = kanap.altTxt
     const colors = kanap.colors
@@ -24,7 +24,6 @@ function addData(kanap) {
     addPrice(price)
     addDescription(description)//Appeler la fonction addDescription avec pour valeur (description)
     addColor(colors)
-    console.log(kanap)
 }
 
 function addImage (imageUrl,altTxt) {
@@ -88,29 +87,19 @@ function saveCart(color,quantity) {
     }
     if (localStorage.getItem("cart")== null){  // si localStorage = null afficher un tableau vide
         cart = [] 
-     }
-     else{
+    }
+    else{
         cart = JSON.parse(localStorage.getItem("cart")) // JSON.parse Pour transformer la chaine de caractère en objet
-     }
-     if( cart.find((item) => item.id === productId && item.color === color)!= null ){
+    }
+    if( cart.find((item) => item.id === productId && item.color === color)!= null ){
         const modifyProduct = cart.find ((item) => item.id === productId && item.color === color) // trouver le produit qui a le mêmr id et la meme couleur
         modifyProduct.quantity = Number(quantity) + modifyProduct.quantity
         //modifier la quantité du produit existant
-     } else{
+    } else{
         cart.push(bag)   // montrer les produits
-     }
-       
-     
-     
-          
-            localStorage.setItem("cart", JSON.stringify(cart)) // JSON.STRINGIFY pour transformer un object en chaine de caractère
-}
-    
-    
+    }
 
-        
-   
-            
-    
-        
-   
+
+    localStorage.setItem("cart", JSON.stringify(cart)) // JSON.STRINGIFY pour transformer un object en chaine de caractère
+}
+
