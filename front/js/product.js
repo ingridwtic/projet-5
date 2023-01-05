@@ -8,6 +8,10 @@ const productId = urlParams.get("id")       //Renvoyer le paramettre id ou recup
 fetch(`http://localhost:3000/api/products/${productId}`)  // creer une requette via l'Api fetch pour avoir l'id du produit
 .then(res => res.json())
 .then (res => addData(res))
+.catch((err) => {
+    document.querySelector(".item").innerHTML = "<h1>erreur 404, sur ressource d'api<br> Retourner à la page d'accueil</h1>";
+    console.log("erreur 404, sur ressource api: " + err);
+    });
     //Ajout des articles à la page de produits
 function addData(kanap) {
     const altTxt = kanap.altTxt
@@ -65,15 +69,21 @@ if(button != null) {
     button.addEventListener("click", (e) => {  // ecouter l'evenement click et faire l'action ci-dessous
         const color = document.querySelector("#colors").value
         const quantity = document.querySelector("#quantity").value //renvoie un tableau dont les valeurs des propriétés énumérables sont directement rattachées à la div quantity
-        if(color == null || color ==="" || quantity == null || quantity == 0){ // si au moins un de ses elements est vrai, renvoyer une alerte
-            alert ("please select a color and quantity")
+        if(color == null || color ==="" || quantity == null || quantity < 1 || quantity > 100){ // si au moins un de ses elements est vrai, renvoyer une alerte
+            alert ("please select a color and quantity between 1 and 100")
+            return true
+        }
+        else {
+            let cart;
+            
+        window.location.href = "cart.html" // mettre un lien entre product.js et
+        saveCart(color,quantity)
+            return false
         }
 
 
-        let cart;
+        
 
-        window.location.href = "cart.html" // mettre un lien entre product.js et
-        saveCart(color,quantity)
     })
 }
 

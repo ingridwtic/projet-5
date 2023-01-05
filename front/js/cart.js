@@ -44,7 +44,7 @@ function createArticle(item,cart) {
     article.dataset.id = item.id // data set pour l'ajout des attribut
     article.dataset.color = item.color// data set pour l'ajout de l'attribut color
 
-     //creer l'element image
+    //creer l'element image
     const cartItemImg = document.createElement("div")
     cartItemImg.classList.add("cart__item__img")
 
@@ -167,7 +167,7 @@ function deletePageProduct(item) {
 }
 
     //ajout du formulaire
-//passer la commande
+    //passer la commande
     const orderButton = document.querySelector("#order")
     orderButton.addEventListener("click",(e) => submitForm(e))
 
@@ -180,7 +180,7 @@ function submitForm(e) {
     }
     
     if (firstName.value == "") {
-        alert("Mettez votre adresse.");
+        alert("Mettez votre prenom.");
         firstName.focus();
         return false;
     }
@@ -195,7 +195,7 @@ function submitForm(e) {
         return false;
     }
     if (city.value == "") {
-        alert("Mettez votre adresse.");
+        alert("Mettez votre ville.");
         city.focus();
         return false;
     }
